@@ -32,9 +32,9 @@ app.post('/hook', async function (req: any, res) {
     await notify(data, db)
     res.json({ success: true })
 })
-app.post('/subscribe', function (req, res) {
+app.post('/subscribe', function (req: any, res) {
     //req.body is a Buffer object
-    console.log(req.body)
+    console.log(req.aes)
     const r = subscribe(req.body)
     res.json({ success: r })
 })
