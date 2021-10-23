@@ -18,7 +18,7 @@ export default async function notify(data: any, db: DB) {
             body: data.body ? data.body : data.title,
             data: {
                 domain: db.domain,
-                ...data.data
+                ...data
             }
         })
     }
