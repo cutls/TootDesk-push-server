@@ -43,6 +43,12 @@ export default async (body: IBody) => {
         }
     }
     try {
+        const r = await axios.delete(`https://${domain}/api/v1/push/subscription`, {
+            headers: {
+                Authorization: `Bearer ${at}`,
+                'content-type': 'application/json'
+            }
+        })
         const a = await axios.post(`https://${domain}/api/v1/push/subscription`, param, {
             headers: {
                 Authorization: `Bearer ${at}`,
