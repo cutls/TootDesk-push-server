@@ -101,7 +101,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         const senderPublicReg = cryptoKey.match(/^dh=([^;]+).+/)
         if (!senderPublicReg) return false
         const senderPublic = decodeBase64(senderPublicReg[1])
-        const serverKeyReg = cryptoKey.match(/^p256ecdsa=([^;]+).+/)
+        const serverKeyReg = cryptoKey.match(/.+p256ecdsa=([^;]+)$/)
         console.log('1st step', cryptoKey)
         if (!serverKeyReg) return false
         const serverKey = serverKeyReg[1]
