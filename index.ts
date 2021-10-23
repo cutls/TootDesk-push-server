@@ -28,11 +28,11 @@ app.post('/hook/:uuid', async function (req: any, res) {
     if (!verified) res.statusCode = 401
     if (!verified) return res.json({ success: false })
     const decodedData = await decode(req.aes, req.headers, uuid)
-    console.log(decodedData)
     if (!decodedData) res.statusCode = 400
     if (!decodedData) return res.json({ success: false })
     const [data, db] = decodedData
     if (typeof db === 'string') return res.json({ success: false })
+    console.log(data)
     await notify(data, db)
     res.json({ success: true })
 })
