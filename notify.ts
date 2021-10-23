@@ -9,15 +9,17 @@ import jwt from 'jsonwebtoken'
 import fs from 'fs'
 import http2 from 'http2'
 export default async function notify(data: any, db: DB) {
-    return false
     if (db.platform === 'ios') {
-        sendToiOS(db.token, db.domain, data.title, 0, data.data)
+        sendToiOS(db.token, data.title ? data.title : db.domain, data.body ? data.body : data.title, 0, data.data)
     } else if (db.platform === 'expo') {
         await axios.post(`https://expo.io/--/api/v2/push/send`, {
             to: db.token,
-            title: db.domain,
-            body: data.title,
-            data
+            title: data.title ? data.title : db.domain,
+            body: data.body ? data.body : data.title,
+            data: {
+                domain: db.domain,
+                ...data.data
+            }
         })
     }
 }
