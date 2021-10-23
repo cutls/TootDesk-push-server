@@ -22,6 +22,7 @@ app.use('/hook', function (req: any, res, next) {
 })
 app.post('/hook', async function (req: any, res) {
     //req.body is a Buffer object
+    console.log(req.aes, req.headers)
     const verified = verify(req.headers)
     if (!verified) res.statusCode = 401
     if (!verified) return res.json({ success: false })
