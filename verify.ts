@@ -42,8 +42,8 @@ function decodeBase64(src: string) {
 
 export default function main(header: { [key: string]: string | string[] }) {
     console.log('initial step')
-    const authHeader = header['Authorization']
-    const cryptoKey = header['Crypto-Key']
+    const authHeader = header['authorization']
+    const cryptoKey = header['crypto-key']
     console.log(authHeader, cryptoKey, typeof authHeader, typeof cryptoKey)
     if (typeof authHeader !== 'string') return false
     if (typeof cryptoKey !== 'string') return false
