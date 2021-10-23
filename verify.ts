@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
     tateisu JWT verify
     https://gist.github.com/tateisu/18e9807dfb8779c247d6297bcf445686
@@ -7,14 +8,13 @@ import asn from 'asn1.js'
 // const fs = require('fs')
 
 // ECDSA public key ASN.1 format
-const ECPublicKey = asn.define('PublicKey', function (e: any) {
-    const app = e as any
-    app.seq().obj(
-        app.key('algorithm').seq().obj(
-            app.key('id').objid(),
-            app.key('curve').objid()
+const ECPublicKey = asn.define('PublicKey', function () {
+    this.seq().obj(
+        this.key('algorithm').seq().obj(
+            this.key('id').objid(),
+            this.key('curve').objid()
         ),
-        app.key('pub').bitstr()
+        this.key('pub').bitstr()
     );
 });
 
