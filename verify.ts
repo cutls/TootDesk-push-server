@@ -41,13 +41,10 @@ function decodeBase64(src: string) {
 }
 
 export default function main(header: { [key: string]: string | string[] }) {
-    console.log('initial step')
     const authHeader = header['authorization']
     const cryptoKey = header['crypto-key']
-    console.log(authHeader, cryptoKey, typeof authHeader, typeof cryptoKey)
     if (typeof authHeader !== 'string') return false
     if (typeof cryptoKey !== 'string') return false
-    console.log('1st step')
     const reAuthorizationWebPush = new RegExp('^WebPush\\s+(\\S+)')
     const reCryptoKeySignPublicKey = new RegExp('p256ecdsa=([^;\\s]+)')
 
@@ -56,18 +53,15 @@ export default function main(header: { [key: string]: string | string[] }) {
         console.log('header not match: Authorization')
         return false
     } else {
-        console.log('2nd step')
         const token = m[1]
 
         m = reCryptoKeySignPublicKey.exec(cryptoKey)
         if (!m) {
             console.log('header not match: Crypto-Key')
         } else {
-            console.log('3rd step')
             const publicKey = decodeBase64(m[1])
             const pem = getPemFromPublicKey(publicKey)
             // fs.writeFileSync("./public2.pem", pem + "\n");
-            console.log('last step')
             const decoded = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
             console.log(decoded)
             // { aud: 'https://mastodon-msg.juggler.jp',exp: 1526559986,sub: 'mailto:tateisu@gmail.com' }
@@ -77,6 +71,7 @@ export default function main(header: { [key: string]: string | string[] }) {
                 const decoded2 = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
                 console.log('verifing...')
                 if (decoded2) return true
+                console.log('verifing failed with no error')
                 return false
             } catch (err) {
                 console.log(`verify failed: ${err}`)

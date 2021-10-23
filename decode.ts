@@ -102,10 +102,12 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         if (!senderPublicReg) return false
         const senderPublic = decodeBase64(senderPublicReg[1])
         const serverKeyReg = cryptoKey.match(/^p256ecdsa=([^;]+).+/)
+        console.log('1st step', cryptoKey)
         if (!serverKeyReg) return false
         const serverKey = serverKeyReg[1]
         const [rows, fields] = await pool.query(my(config.DB_TABLE).select().where('serverKey', serverKey).toString()) as any
         const row = rows[0] as DB
+        console.log(row, serverKey)
         if (!row) return false
 
         // Authentication secret (authSecret)
@@ -123,6 +125,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         const encryptionHeader = header.encryption
         if (typeof encryptionHeader !== 'string') return false
         const saltMatch = encryptionHeader.match(/salt=(.+)/)
+        console.log('2nd step')
         if (!saltMatch) return false
         const salt = decodeBase64(saltMatch[1])
 
@@ -133,7 +136,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
 
         const authInfo = Buffer.from('Content-Encoding: auth\0', 'utf8')
         const prk = hkdf(authSecret, sharedSecret, authInfo, 32)
-
+        console.log('3rd step')
         // Derive the Content Encryption Key
         const contentEncryptionKeyInfo = createInfo('aesgcm', receiverPublic, senderPublic)
         const contentEncryptionKey = hkdf(salt, prk, contentEncryptionKeyInfo, 16)
@@ -151,6 +154,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         result = result.slice(pad_length, result.length - 16)
         return [result.toString('utf8'), row]
     } catch (e) {
+        console.error(e)
         return false
     }
 }
