@@ -105,7 +105,10 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         console.log('1st step', cryptoKey)
         if (!serverKeyReg) return false
         const serverKey = serverKeyReg[1]
-        const [rows, fields] = await pool.query(my(config.DB_TABLE).select().where('serverKey', serverKey).toString()) as any
+        console.log(serverKey)
+        const sql = my(config.DB_TABLE).select().where('serverKey', serverKey).toString()
+        console.log(sql)
+        const [rows, fields] = await pool.query(sql) as any
         const row = rows[0] as DB
         console.log(row, serverKey)
         if (!row) return false
