@@ -11,7 +11,7 @@ const server = app.listen(8019, function () {
     console.log('TootDesk Notification Server is running on port 8019')
 })
 
-app.use('/hook', function (req: any, res, next) {
+app.use('/hook/:id', function (req: any, res, next) {
     getRawBody(req, {
         limit: '40kb'
     }, function (err, string) {
@@ -20,13 +20,14 @@ app.use('/hook', function (req: any, res, next) {
         next()
     })
 })
-app.post('/hook', async function (req: any, res) {
+app.post('/hook/:uuid', async function (req: any, res) {
     //req.body is a Buffer object
+    const { uuid } = req.params
     console.log(req.aes, req.headers)
     const verified = verify(req.headers)
     if (!verified) res.statusCode = 401
     if (!verified) return res.json({ success: false })
-    const decodedData = await decode(req.aes, req.headers)
+    const decodedData = await decode(req.aes, req.headers, uuid)
     console.log(decodedData)
     if (!decodedData) res.statusCode = 400
     if (!decodedData) return res.json({ success: false })

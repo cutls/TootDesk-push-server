@@ -89,7 +89,7 @@ function createInfo(type: string, clientPublicKey: Buffer, serverPublicKey: Buff
     return info;
 }
 
-export default async function main(buffer: Buffer, header: { [key: string]: string | string[] }) {
+export default async function main(buffer: Buffer, header: { [key: string]: string | string[] }, uuid: string) {
     try {
         /////////////////////////////////////////////
 
@@ -106,7 +106,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         if (!serverKeyReg) return false
         const serverKey = serverKeyReg[1]
         console.log(serverKey)
-        const sql = my(config.DB_TABLE).select().where('serverKey', 'like', `${serverKey}%`).toString()
+        const sql = my(config.DB_TABLE).select().where('uuid', uuid).toString()
         console.log(sql)
         const [rows, fields] = await pool.query(sql) as any
         const row = rows[0] as DB

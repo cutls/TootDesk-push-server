@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import { v4 } from 'uuid'
 import { CONFIG } from './interfaces/config'
 dotenv.config()
 const config = (process.env as unknown) as CONFIG
@@ -23,10 +24,11 @@ interface IBody {
 
 export default async (body: IBody) => {
     const key = genKey()
+    const uuid = v4()
     const { domain, at, token, platform } = body
     const param = {
         subscription: {
-            endpoint: `${config.ENDPOINT}/hook`,
+            endpoint: `${config.ENDPOINT}/hook/${uuid}`,
             keys: {
                 p256dh: key.publicKey,
                 auth: key.auth
@@ -58,6 +60,7 @@ export default async (body: IBody) => {
         const data = a.data as any
         const serverKey = data.server_key
         const sql = my(config.DB_TABLE).insert({
+            uuid,
             token,
             serverKey,
             platform,
