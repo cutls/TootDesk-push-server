@@ -23,7 +23,7 @@ app.use('/hook/:id', function (req: any, res, next) {
 app.post('/hook/:uuid', async function (req: any, res) {
     //req.body is a Buffer object
     const { uuid } = req.params
-    console.log(req.aes, req.headers)
+    //console.log(req.aes, req.headers)
     const verified = verify(req.headers)
     if (!verified) res.statusCode = 401
     if (!verified) return res.json({ success: false })
@@ -32,7 +32,7 @@ app.post('/hook/:uuid', async function (req: any, res) {
     if (!decodedData) return res.json({ success: false })
     const [data, db] = decodedData
     if (typeof db === 'string') return res.json({ success: false })
-    console.log(data)
+    //console.log(data)
     await notify(data, db)
     res.json({ success: true })
 })

@@ -40,7 +40,7 @@ async function sendToAndroid(token: string | string[], title: string, message: s
         } else {
             payload.registration_ids = token
         }
-        console.log(payload)
+        //console.log(payload)
         const data = await axios.post(`https://fcm.googleapis.com/fcm/send`,
             JSON.stringify(payload),
             {
@@ -50,8 +50,8 @@ async function sendToAndroid(token: string | string[], title: string, message: s
                 }
             }
         )
-        console.log(`android notf requested to ${typeof token === 'string' ? token.substr(0, 10) : token.map((a) => { return a.substr(0, 10) }).join(',')}`)
-        if (!data.data.success) console.log(data.data)
+        //console.log(`android notf requested to ${typeof token === 'string' ? token.substr(0, 10) : token.map((a) => { return a.substr(0, 10) }).join(',')}`)
+        if (!data.data.success) //console.log(data.data)
     } catch (e) {
         console.error(moment().unix(), e)
     }
@@ -84,7 +84,7 @@ export async function sendToiOS(token: string | string[], title: string, message
         ':path': `/3/device/${token}`,
         authorization: `bearer ${authorizationToken}`,
     })
-    console.log(`ios notf requested to ${token}`)
+    //console.log(`ios notf requested to ${token}`)
 
     request.setEncoding("utf8")
     const body = {
@@ -98,7 +98,7 @@ export async function sendToiOS(token: string | string[], title: string, message
         experienceId: '@cutls/we-tips',
     } as any
     if (badge) body.aps.badge = badge
-    console.log(body)
+    //console.log(body)
     for (const thisToken of useToken) {
         request.write(
             JSON.stringify(body)
@@ -108,7 +108,7 @@ export async function sendToiOS(token: string | string[], title: string, message
 
     request.on('response', (headers, flags) => {
         for (const name in headers) {
-            console.log('response', `${name}: ${headers[name]}`)
+            //console.log('response', `${name}: ${headers[name]}`)
         }
     });
 
@@ -118,7 +118,7 @@ export async function sendToiOS(token: string | string[], title: string, message
     })
 
     request.on('end', () => {
-        console.log('end', `\n${data}`)
+        //console.log('end', `\n${data}`)
         client.close()
     })
 

@@ -50,31 +50,31 @@ export default function main(header: { [key: string]: string | string[] }) {
 
     let m = reAuthorizationWebPush.exec(authHeader)
     if (!m) {
-        console.log('header not match: Authorization')
+        //console.log('header not match: Authorization')
         return false
     } else {
         const token = m[1]
 
         m = reCryptoKeySignPublicKey.exec(cryptoKey)
         if (!m) {
-            console.log('header not match: Crypto-Key')
+            //console.log('header not match: Crypto-Key')
         } else {
             const publicKey = decodeBase64(m[1])
             const pem = getPemFromPublicKey(publicKey)
             // fs.writeFileSync("./public2.pem", pem + "\n");
             const decoded = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
-            console.log(decoded)
+            //console.log(decoded)
             // { aud: 'https://mastodon-msg.juggler.jp',exp: 1526559986,sub: 'mailto:tateisu@gmail.com' }
 
             // error case
             try {
                 const decoded2 = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
-                console.log('verifing...')
+                //console.log('verifing...')
                 if (decoded2) return true
-                console.log('verifing failed with no error')
+                //console.log('verifing failed with no error')
                 return false
             } catch (err) {
-                console.log(`verify failed: ${err}`)
+                //console.log(`verify failed: ${err}`)
                 // verify failed: JsonWebTokenError: invalid token
             }
         }
@@ -91,10 +91,10 @@ JWTトークンの署名の検証
 // openssl ec -in private.pem -pubout -out public.pem
 var priv = fs.readFileSync('./private.pem')
 var token = jwt.sign("{ foo: 'bar' }", priv, { algorithm: 'ES256' })
-console.log(token)
+//console.log(token)
 var pub = fs.readFileSync('./public.pem')
 var decoded = jwt.verify(token, pub, { algorithms: ['ES256'] })
-console.log(decoded)
+//console.log(decoded)
 dump of pem file
 $ openssl asn1parse -in public.pem -dump
     0:d=0  hl=2 l=  89 cons: SEQUENCE
