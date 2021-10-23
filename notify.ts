@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken'
 import fs from 'fs'
 import http2 from 'http2'
 export default async function notify(data: any, db: DB) {
+    return false
     if (db.platform === 'ios') {
         sendToiOS(db.token, db.domain, data.title, 0, data.data)
     } else if (db.platform === 'expo') {

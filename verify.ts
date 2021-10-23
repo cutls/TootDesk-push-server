@@ -72,6 +72,7 @@ export default function main(header: { [key: string]: string | string[] }) {
             // error case
             try {
                 const decoded2 = jwt.verify(token + 'xxx', Buffer.from(pem), { algorithms: ['ES256'] })
+                console.log('verifing...')
                 if (decoded2) return true
                 return false
             } catch (err) {

@@ -51,7 +51,7 @@ export default async (body: IBody) => {
         })
         const data = a.data as any
         const serverKey = data.server_key
-        const sql = my.insert(config.DB_TABLE).insert({
+        const sql = my(config.DB_TABLE).insert({
             token,
             serverKey,
             platform,
@@ -63,6 +63,7 @@ export default async (body: IBody) => {
         await pool.query(sql)
         return true
     } catch (e) {
+        console.error(e)
         return false
     }
 }

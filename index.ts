@@ -26,6 +26,7 @@ app.post('/hook', async function (req: any, res) {
     if (!verified) res.statusCode = 401
     if (!verified) return res.json({ success: false })
     const decodedData = await decode(req.aes, req.headers)
+    console.log(decodedData)
     if (!decodedData) res.statusCode = 400
     if (!decodedData) return res.json({ success: false })
     const [data, db] = decodedData
@@ -36,7 +37,6 @@ app.post('/hook', async function (req: any, res) {
 app.use('/subscribe', bodyParser.json())
 app.post('/subscribe', function (req: any, res) {
     //req.body is a Buffer object
-    console.log(req.body)
     const r = subscribe(req.body)
     res.json({ success: r })
 })
