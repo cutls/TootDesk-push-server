@@ -155,7 +155,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
             pad_length = 2 + result.readUInt16BE(0)
         }
         result = result.slice(pad_length, result.length - 16)
-        return [result.toString('utf8'), row]
+        return [JSON.parse(result.toString('utf8').match(/.?({.+}).?/)[1]), row]
     } catch (e) {
         console.error(e)
         return false
