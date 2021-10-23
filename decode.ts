@@ -157,7 +157,8 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
         result = result.slice(pad_length, result.length - 16)
         const jsonGetter = result.toString('utf8').match(/.?({.+}).?/)
         if(!jsonGetter) return false
-        return [JSON.parse(jsonGetter[1]), row]
+        const json = jsonGetter[1]
+        return [JSON.parse(json), row]
     } catch (e) {
         console.error(e)
         return false
