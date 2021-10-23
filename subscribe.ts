@@ -26,7 +26,7 @@ export default async (body: IBody) => {
     const { domain, at, token, platform } = body
     const param = {
         subscription: {
-            endpoint: config.ENDPOINT,
+            endpoint: `${config.ENDPOINT}/hook`,
             keys: {
                 p256dh: key.publicKey,
                 auth: key.auth
