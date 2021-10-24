@@ -42,3 +42,6 @@ app.post('/subscribe', function (req: any, res) {
     const r = subscribe(req.body)
     res.json({ success: r })
 })
+app.get('/', function (req: any, res) {
+    res.json({ iam: 'TootDesk push server' })
+})
