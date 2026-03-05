@@ -9,78 +9,75 @@ import asn from 'asn1.js'
 
 // ECDSA public key ASN.1 format
 const ECPublicKey = asn.define('PublicKey', function () {
-    this.seq().obj(
-        this.key('algorithm').seq().obj(
-            this.key('id').objid(),
-            this.key('curve').objid()
-        ),
-        this.key('pub').bitstr()
-    );
-});
+	this.seq().obj(this.key('algorithm').seq().obj(this.key('id').objid(), this.key('curve').objid()), this.key('pub').bitstr())
+})
 
 // convert public key from p256ecdsa to PEM
 function getPemFromPublicKey(public_key: Buffer) {
-    return ECPublicKey.encode({
-        algorithm: {
-            id: [1, 2, 840, 10045, 2, 1],  // :id-ecPublicKey
-            curve: [1, 2, 840, 10045, 3, 1, 7] // prime256v1
-        },
-        pub: {
-            // このunused により bitstringの先頭に 00 が置かれる。
-            // 先頭の00 04 が uncompressed を示す
-            // https://tools.ietf.org/html/rfc5480#section-2.3.2
-            // http://www.secg.org/sec1-v2.pdf section 2.3.3
-            unused: 0,
-            data: public_key,
-        },
-    }, 'pem', { label: 'PUBLIC KEY' })
+	return ECPublicKey.encode(
+		{
+			algorithm: {
+				id: [1, 2, 840, 10045, 2, 1], // :id-ecPublicKey
+				curve: [1, 2, 840, 10045, 3, 1, 7] // prime256v1
+			},
+			pub: {
+				// このunused により bitstringの先頭に 00 が置かれる。
+				// 先頭の00 04 が uncompressed を示す
+				// https://tools.ietf.org/html/rfc5480#section-2.3.2
+				// http://www.secg.org/sec1-v2.pdf section 2.3.3
+				unused: 0,
+				data: public_key
+			}
+		},
+		'pem',
+		{ label: 'PUBLIC KEY' }
+	)
 }
 
 function decodeBase64(src: string) {
-    return Buffer.from(src, 'base64')
+	return Buffer.from(src, 'base64')
 }
 
 export default function main(header: { [key: string]: string | string[] }) {
-    const authHeader = header['authorization']
-    const cryptoKey = header['crypto-key']
-    if (typeof authHeader !== 'string') return false
-    if (typeof cryptoKey !== 'string') return false
-    const reAuthorizationWebPush = new RegExp('^WebPush\\s+(\\S+)')
-    const reCryptoKeySignPublicKey = new RegExp('p256ecdsa=([^;\\s]+)')
+	const authHeader = header['authorization']
+	const cryptoKey = header['crypto-key']
+	if (typeof authHeader !== 'string') return false
+	if (typeof cryptoKey !== 'string') return false
+	const reAuthorizationWebPush = /^WebPush\s+(\S+)/
+	const reCryptoKeySignPublicKey = /p256ecdsa=([^;\s]+)/
 
-    let m = reAuthorizationWebPush.exec(authHeader)
-    if (!m) {
-        //console.log('header not match: Authorization')
-        return false
-    } else {
-        const token = m[1]
+	let m = reAuthorizationWebPush.exec(authHeader)
+	if (!m) {
+		//console.log('header not match: Authorization')
+		return false
+	} else {
+		const token = m[1]
 
-        m = reCryptoKeySignPublicKey.exec(cryptoKey)
-        if (!m) {
-            //console.log('header not match: Crypto-Key')
-        } else {
-            const publicKey = decodeBase64(m[1])
-            const pem = getPemFromPublicKey(publicKey)
-            // fs.writeFileSync("./public2.pem", pem + "\n");
-            const decoded = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
-            //console.log(decoded)
-            // { aud: 'https://mastodon-msg.juggler.jp',exp: 1526559986,sub: 'mailto:tateisu@gmail.com' }
+		m = reCryptoKeySignPublicKey.exec(cryptoKey)
+		if (!m) {
+			//console.log('header not match: Crypto-Key')
+		} else {
+			const publicKey = decodeBase64(m[1])
+			const pem = getPemFromPublicKey(publicKey)
+			// fs.writeFileSync("./public2.pem", pem + "\n");
+			const decoded = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
+			//console.log(decoded)
+			// { aud: 'https://mastodon-msg.juggler.jp',exp: 1526559986,sub: 'mailto:tateisu@gmail.com' }
 
-            // error case
-            try {
-                const decoded2 = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
-                //console.log('verifing...')
-                if (decoded2) return true
-                //console.log('verifing failed with no error')
-                return false
-            } catch (err) {
-                //console.log(`verify failed: ${err}`)
-                // verify failed: JsonWebTokenError: invalid token
-            }
-        }
-    }
+			// error case
+			try {
+				const decoded2 = jwt.verify(token, Buffer.from(pem), { algorithms: ['ES256'] })
+				//console.log('verifing...')
+				if (decoded2) return true
+				//console.log('verifing failed with no error')
+				return false
+			} catch (err) {
+				//console.log(`verify failed: ${err}`)
+				// verify failed: JsonWebTokenError: invalid token
+			}
+		}
+	}
 }
-
 
 /*
 JWTトークンの署名の検証
