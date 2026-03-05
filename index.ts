@@ -48,14 +48,14 @@ app.post('/subscribe', (req: any, res) => {
 	res.json({ success: r })
 })
 app.use('/v2/prepare', bodyParser.json())
-app.post('/v2/prepare', (req: any, res) => {
-	const r = subscribe.pre(req.body)
+app.post('/v2/prepare', async (req: any, res) => {
+	const r = await subscribe.pre(req.body)
 	if (r) res.json({ data: r, success: true })
 	if (!r) res.json({ success: false })
 })
 app.use('/v2/subscribe', bodyParser.json())
-app.post('/v2/subscribe', (req: any, res) => {
-	const r = subscribe.subscribe(req.body)
+app.post('/v2/subscribe', async (req: any, res) => {
+	const r = await subscribe.subscribe(req.body)
 	res.json({ success: r })
 })
 app.get('/', (req: any, res) => {
