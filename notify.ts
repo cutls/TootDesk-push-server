@@ -63,14 +63,14 @@ export async function sendToiOS(token: string | string[], title: string, message
 	const p8 = Buffer.from(config.APN_P8, 'base64').toString()
 	const authorizationToken = jwt.sign(
 		{
-			iss: 'J529S6NXTQ',
+			iss: config.APN_ISS,
 			iat: Math.round(new Date().getTime() / 1000)
 		},
 		p8,
 		{
 			header: {
 				alg: 'ES256',
-				kid: '4A9K7DX83L'
+				kid: config.APN_KID
 			}
 		}
 	)
@@ -81,7 +81,7 @@ export async function sendToiOS(token: string | string[], title: string, message
 		':scheme': 'https',
 		'apns-priority': 10,
 		'apns-expiration': moment().add(1, 'day').unix(),
-		'apns-topic': 'top.thedesk.toot',
+		'apns-topic': config.APN_TOPIC,
 		':path': `/3/device/${token}`,
 		authorization: `bearer ${authorizationToken}`
 	})
@@ -96,7 +96,7 @@ export async function sendToiOS(token: string | string[], title: string, message
 			}
 		},
 		body: { customData },
-		experienceId: '@cutls/we-tips'
+		experienceId: config.APN_EXPERIENCE_ID
 	} as any
 	if (badge) body.aps.badge = badge
 	//console.log(body)
