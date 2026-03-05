@@ -1,9 +1,7 @@
 export interface CONFIG {
-	DB_TABLE: string
-	DB_HOST: string
-	DB_USER: string
-	DB_PASSWORD: string
-	DB_DATABASE: string
 	ENDPOINT: string
 	APN_P8: string
+	FIREBASE_PROJECT_ID: string
+	FIREBASE_CLIENT_EMAIL: string
+	FIREBASE_PRIVATE_KEY: string
 }

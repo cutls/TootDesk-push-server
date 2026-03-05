@@ -6,21 +6,21 @@
 import crypto from 'crypto'
 import * as dotenv from 'dotenv'
 import axios from 'axios'
-import * as mysql from 'mysql2/promise'
 import type { CONFIG } from './interfaces/config'
-import knex from 'knex'
-import type { DB } from './interfaces/db'
-const my = knex({ client: 'mysql' })
-
 dotenv.config()
 const config = process.env as unknown as CONFIG
-const dbConfig = {
-	host: config.DB_HOST,
-	user: config.DB_USER,
-	password: config.DB_PASSWORD,
-	database: config.DB_DATABASE
+import { getFirestore } from 'firebase-admin/firestore'
+import admin from 'firebase-admin'
+if (admin.apps.length === 0) {
+	admin.initializeApp({
+		credential: admin.credential.cert({
+			projectId: config.FIREBASE_PROJECT_ID,
+			clientEmail: config.FIREBASE_CLIENT_EMAIL,
+			privateKey: config.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+		})
+	})
 }
-const pool = mysql.createPool(dbConfig)
+const db = getFirestore()
 
 function decodeBase64(src: string) {
 	return Buffer.from(src, 'base64')
@@ -107,10 +107,9 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
 		if (!serverKeyReg) return false
 		const serverKey = serverKeyReg[1]
 		//console.log(serverKey)
-		const sql = my(config.DB_TABLE).select().where('uuid', uuid).toString()
+		const rows = await db.collection('subscription').doc(uuid).get()
+		const row = rows.data()
 		//console.log(sql)
-		const [rows, fields] = (await pool.query(sql)) as any
-		const row = rows[0] as DB
 		//console.log(row, serverKey)
 		if (!row) return false
 
@@ -152,7 +151,7 @@ export default async function main(buffer: Buffer, header: { [key: string]: stri
 		let result = decipher.update(buffer)
 		// remove padding and GCM auth tag
 		let pad_length = 0
-		if (result.length >= 3 && result[2] == 0) {
+		if (result.length >= 3 && result[2] === 0) {
 			pad_length = 2 + result.readUInt16BE(0)
 		}
 		result = result.slice(pad_length, result.length - 16)

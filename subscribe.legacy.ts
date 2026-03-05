@@ -7,14 +7,18 @@ import axios from 'axios'
 import * as mysql from 'mysql2/promise'
 import knex from 'knex'
 import genKey from './genKey'
-const dbConfig = {
-	host: config.DB_HOST,
-	user: config.DB_USER,
-	password: config.DB_PASSWORD,
-	database: config.DB_DATABASE
+import { getFirestore } from 'firebase-admin/firestore'
+import admin from 'firebase-admin'
+if (admin.apps.length === 0) {
+	admin.initializeApp({
+		credential: admin.credential.cert({
+			projectId: config.FIREBASE_PROJECT_ID,
+			clientEmail: config.FIREBASE_CLIENT_EMAIL,
+			privateKey: config.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+		})
+	})
 }
-const pool = mysql.createPool(dbConfig)
-const my = knex({ client: 'mysql' })
+const db = getFirestore()
 interface IBody {
 	domain: string
 	at: string
@@ -59,19 +63,16 @@ export default async (body: IBody) => {
 		})
 		const data = a.data as any
 		const serverKey = data.server_key
-		const sql = my(config.DB_TABLE)
-			.insert({
-				uuid,
-				token,
-				serverKey,
-				platform,
-				publicKey: key.publicKey,
-				privateKey: key.privateKey,
-				auth: key.auth,
-				domain
-			})
-			.toString()
-		await pool.query(sql)
+		const add: any = {
+			token,
+			serverKey,
+			platform,
+			publicKey: key.publicKey,
+			privateKey: key.privateKey,
+			auth: key.auth,
+			domain
+		}
+		await db.collection('subscription').doc(uuid).set(add)
 		return true
 	} catch (e) {
 		console.error(e)
