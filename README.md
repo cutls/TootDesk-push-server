@@ -6,6 +6,9 @@ This project is published for reference purposes during implementation. If you w
 
 This software is hosted at `push.thedesk.top` only for official TheDesk mobile. If you rebuild TheDesk mobile yourself, you must host this project or compatible software yourself at your domain and subscribe to push notifications for that domain.
 
+If you try to make Mastodon client for iOS? This project will make it easy to implement push notification.
+Let's clone now!
+
 ## Requirement
 
 * Node.js >= 20
@@ -23,8 +26,6 @@ This software is hosted at `push.thedesk.top` only for official TheDesk mobile. 
 * `yarn start` or `node dist/index.js` to start
 
 ## REST API
-
-If you try to make Mastodon client for iOS?
 
 ### `POST /v2/prepare`
 
